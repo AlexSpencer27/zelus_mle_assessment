@@ -102,7 +102,7 @@ chmod +x run_model.sh
 ## Option 2: Clone the Repository & Build Locally
 If you'd like to reproduce the entire pipeline locally:
 
-1. Clone the repository Ensure you have Git LFS installed before cloning:
+1. Ensure you have Git LFS installed, then clone the repository:
 ```bash
    git lfs install
    git clone git@github.com:<your-username>/zelus_mle_assessment.git
