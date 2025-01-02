@@ -1,0 +1,5 @@
+joblib
+pandas
+pyarrow
+scikit-learn
+typer

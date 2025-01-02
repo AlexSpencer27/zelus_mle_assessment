@@ -1,0 +1,246 @@
+schema: '2.0'
+stages:
+  parse_match_results:
+    cmd: python ./src/parsing/parse_match_results.py
+    deps:
+    - path: ./data/provided_json/match_results.json
+      hash: md5
+      md5: 2b7ae26862f5251097e871c0adc4f2e9
+      size: 1370967
+    - path: ./src/parsing/parse_match_results.py
+      hash: md5
+      md5: 00b7c2f4793011d4786a7c7afdc75f2c
+      size: 1391
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/parsed/match_results.parquet
+      hash: md5
+      md5: 2c0bb36651bfcf638160f85f62aae9e2
+      size: 62035
+  parse_innings_results:
+    cmd: python ./src/parsing/parse_innings_results.py
+    deps:
+    - path: ./data/provided_json/innings_results.json
+      hash: md5
+      md5: 294f6e81104ec7867d44a82513be2a53
+      size: 217898719
+    - path: ./src/parsing/parse_innings_results.py
+      hash: md5
+      md5: 0902685be860ebf16bc4c8b98d68e7ac
+      size: 1399
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/parsed/innings_results.parquet
+      hash: md5
+      md5: 2cd6f94ba1036e03a978c0d94fe81b93
+      size: 9432660
+  filter_innings_results:
+    cmd: python ./src/dataset_curation/filter_innings_results.py
+    deps:
+    - path: ./data/parsed/innings_results.parquet
+      hash: md5
+      md5: 2cd6f94ba1036e03a978c0d94fe81b93
+      size: 9432660
+    - path: ./data/parsed/match_results.parquet
+      hash: md5
+      md5: 2c0bb36651bfcf638160f85f62aae9e2
+      size: 62035
+    - path: ./src/dataset_curation/filter_innings_results.py
+      hash: md5
+      md5: a39f8b9a5f8abc37178961d9edd009b4
+      size: 5079
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/intermediate/filtered_innings.parquet
+      hash: md5
+      md5: e310883fced20c69a0f156f8c92a849f
+      size: 13361019
+  question_3a:
+    cmd: python ./src/dataset_curation/q3a.py
+    deps:
+    - path: ./data/intermediate/filtered_innings.parquet
+      hash: md5
+      md5: e310883fced20c69a0f156f8c92a849f
+      size: 13361019
+    - path: ./src/dataset_curation/q3a.py
+      hash: md5
+      md5: 5c88842486afad4d48c01e65e389c8d8
+      size: 1157
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/intermediate/q3a.csv
+      hash: md5
+      md5: 99449eefbf003cdacce972d992e1c8b9
+      size: 16977100
+  create_training_data:
+    cmd: python ./src/dataset_curation/create_training_data.py
+    deps:
+    - path: ./data/intermediate/filtered_innings.parquet
+      hash: md5
+      md5: e310883fced20c69a0f156f8c92a849f
+      size: 13361019
+    - path: ./src/dataset_curation/create_training_data.py
+      hash: md5
+      md5: 6d24b18fcdca644023a0be63ecd9c16d
+      size: 2229
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/training/training_data.parquet
+      hash: md5
+      md5: 03f0b45e589419a038c9cc7260da6f5b
+      size: 1868774
+    - path: ./src/model_package/data.parquet
+      hash: md5
+      md5: 03f0b45e589419a038c9cc7260da6f5b
+      size: 1868774
+  train_model:
+    cmd: python ./src/training/train.py
+    deps:
+    - path: ./data/tests/test_training_data.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+    - path: ./src/training/train.py
+      hash: md5
+      md5: dc06dac88608ad589f990977bda8530f
+      size: 3417
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./src/model_package/expected_runs_model.pkl
+      hash: md5
+      md5: f1c31d7aa386c9e9d8870749b6520f76
+      size: 31001025
+  test_data_quality:
+    cmd: python ./tests/data_quality/test_innings_endings.py && python ./tests/data_quality/test_computed_metrics.py
+      && python ./tests/data_quality/test_training_data.py
+    deps:
+    - path: ./data/training/training_data.parquet
+      hash: md5
+      md5: 03f0b45e589419a038c9cc7260da6f5b
+      size: 1868774
+    - path: ./tests/data_quality/test_computed_metrics.py
+      hash: md5
+      md5: ad6f24a4f39679f9d73934873e588ae9
+      size: 6137
+    - path: ./tests/data_quality/test_innings_endings.py
+      hash: md5
+      md5: 41b8fdec6570bad92eab71436a40c0f8
+      size: 5317
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/tests/test_computed_metrics.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+    - path: ./data/tests/test_innings_endings.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+    - path: ./data/tests/test_training_data.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+  test_training:
+    cmd: python ./tests/training/test_training.py
+    deps:
+    - path: ./data/training/training_data.parquet
+      hash: md5
+      md5: 03f0b45e589419a038c9cc7260da6f5b
+      size: 1868774
+    - path: ./src/model_package/expected_runs_model.pkl
+      hash: md5
+      md5: f1c31d7aa386c9e9d8870749b6520f76
+      size: 31001025
+    - path: ./tests/training/test_training.py
+      hash: md5
+      md5: e8349a67569fcc102242efb151c0d075
+      size: 4525
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/tests/test_training.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+  test_model_interaction:
+    cmd: python ./tests/model_interaction/test_model_interaction.py
+    deps:
+    - path: ./src/model_package/expected_runs_model.pkl
+      hash: md5
+      md5: f1c31d7aa386c9e9d8870749b6520f76
+      size: 31001025
+    - path: ./src/model_package/run_model.py
+      hash: md5
+      md5: ac1a1eecd9751f4caf53295f0515abc1
+      size: 8035
+    - path: ./tests/model_interaction/test_model_interaction.py
+      hash: md5
+      md5: f942861f0151ccdf25cb58d4b597af09
+      size: 7964
+    - path: pyproject.toml
+      hash: md5
+      md5: d03cc4118efec275d89e9815b5754945
+      size: 332
+    outs:
+    - path: ./data/tests/test_model_interaction.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+  build_docker_image:
+    cmd: cd ./src/model_package && docker build -t model_package . && docker tag model_package
+      schnoodfam/zelus_mle_assessment:latest
+    deps:
+    - path: ./data/docker/check_docker.log
+      hash: md5
+      md5: b628cefd63e59ca1f200f9e6c7e423e2
+      size: 26
+    - path: ./data/tests/test_model_interaction.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+    - path: ./data/tests/test_training.json
+      hash: md5
+      md5: 99758e342613364454ea3e626e823ca8
+      size: 35
+    - path: ./src/model_package/Dockerfile
+      hash: md5
+      md5: 8e9449ce40c6de0be5e3c2e664dcc483
+      size: 423
+    - path: ./src/model_package/requirements.txt
+      hash: md5
+      md5: f9092a6d4f93ef2838ad5258e693b93a
+      size: 46
+    - path: ./src/model_package/run_model.py
+      hash: md5
+      md5: ac1a1eecd9751f4caf53295f0515abc1
+      size: 8035
+  check_docker:
+    cmd: python ./src/model_package/check_docker.py
+    outs:
+    - path: ./data/docker/check_docker.log
+      hash: md5
+      md5: b628cefd63e59ca1f200f9e6c7e423e2
+      size: 26

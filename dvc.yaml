@@ -1,0 +1,108 @@
+stages:
+  parse_match_results:
+    cmd: python ./src/parsing/parse_match_results.py
+    deps:
+      - ./data/provided_json/match_results.json
+      - pyproject.toml
+      - ./src/parsing/parse_match_results.py
+    outs:
+      - ./data/parsed/match_results.parquet
+
+  parse_innings_results:
+    cmd: python ./src/parsing/parse_innings_results.py
+    deps:
+      - ./data/provided_json/innings_results.json
+      - pyproject.toml
+      - ./src/parsing/parse_innings_results.py
+    outs:
+      - ./data/parsed/innings_results.parquet
+
+  filter_innings_results:
+    cmd: python ./src/dataset_curation/filter_innings_results.py
+    deps:
+      - ./data/parsed/match_results.parquet
+      - ./data/parsed/innings_results.parquet
+      - pyproject.toml
+      - ./src/dataset_curation/filter_innings_results.py
+    outs:
+      - ./data/intermediate/filtered_innings.parquet
+
+  question_3a:
+    cmd: python ./src/dataset_curation/q3a.py
+    deps:
+      - ./data/intermediate/filtered_innings.parquet
+      - pyproject.toml
+      - ./src/dataset_curation/q3a.py
+    outs:
+      - ./data/intermediate/q3a.csv
+
+  create_training_data:
+    cmd: python ./src/dataset_curation/create_training_data.py
+    deps:
+      - ./data/intermediate/filtered_innings.parquet
+      - pyproject.toml
+      - ./src/dataset_curation/create_training_data.py
+    outs:
+      - ./data/training/training_data.parquet
+      - ./src/model_package/data.parquet
+
+  test_data_quality:
+    cmd: python ./tests/data_quality/test_innings_endings.py && python ./tests/data_quality/test_computed_metrics.py && python ./tests/data_quality/test_training_data.py 
+    deps:
+      - ./data/training/training_data.parquet
+      - ./tests/data_quality/test_innings_endings.py
+      - ./tests/data_quality/test_computed_metrics.py
+      - pyproject.toml
+    outs:
+      - ./data/tests/test_computed_metrics.json
+      - ./data/tests/test_innings_endings.json
+      - ./data/tests/test_training_data.json
+
+  train_model:
+    cmd: python ./src/training/train.py
+    deps:
+      # - ./data/training/training_data.parquet
+      - pyproject.toml
+      - ./src/training/train.py
+      - ./data/tests/test_training_data.json
+    outs:
+      - ./src/model_package/expected_runs_model.pkl
+
+  test_training:
+    cmd: python ./tests/training/test_training.py
+    deps:
+      - ./data/training/training_data.parquet
+      - ./src/model_package/expected_runs_model.pkl
+      - ./tests/training/test_training.py
+      - pyproject.toml
+    outs:
+      - ./data/tests/test_training.json
+
+  test_model_interaction:
+    cmd: python ./tests/model_interaction/test_model_interaction.py
+    deps:
+      - ./src/model_package/run_model.py
+      - ./tests/model_interaction/test_model_interaction.py
+      - pyproject.toml
+      - ./src/model_package/expected_runs_model.pkl
+    outs:
+      - ./data/tests/test_model_interaction.json
+
+  check_docker:
+    cmd: python ./src/model_package/check_docker.py
+    outs:
+      - ./data/docker/check_docker.log
+
+  build_docker_image:
+    cmd: cd ./src/model_package && docker build -t model_package . && docker tag model_package schnoodfam/zelus_mle_assessment:latest
+    deps:
+      - ./src/model_package/Dockerfile
+      - ./src/model_package/requirements.txt
+      - ./src/model_package/run_model.py
+      # - ./src/model_package/data.parquet
+      # - ./src/model_package/expected_runs_model.pkl
+      - ./data/tests/test_training.json
+      - ./data/tests/test_model_interaction.json
+      - ./data/docker/check_docker.log
+    # outs:
+    #   - docker://model_package:latest

@@ -11,6 +11,8 @@ wheels/
 
 # Other
 .vscode/
-/data
+/data/*
+!/data/provided_json/
+!/data/provided_json/*
 
 *.parquet
