@@ -9,6 +9,7 @@ data_folder = script_folder.parent.parent / "data"
 output_folder = data_folder / "intermediate"
 os.makedirs(output_folder, exist_ok=True)
 
+
 def main():
     filtered_innings_file = os.path.join(
         data_folder, "intermediate", "filtered_innings.parquet"
@@ -19,7 +20,10 @@ def main():
 
     # create smaller df for target output
     key_cols = dict(
-        team=dict(dtp=str, rename="team"),
+        matchid=dict(dtp=int, rename="match_id"),
+        date=dict(dtp=str, rename="date"),
+        team=dict(dtp=str, rename="batting_team"),
+        opponent=dict(dtp=str, rename="bowling_team"),
         innings=dict(dtp=int, rename="innings_order"),
         remaining_overs=dict(dtp=int, rename="remaining_overs"),
         remaining_wickets=dict(dtp=int, rename="remaining_wickets"),

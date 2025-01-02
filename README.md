@@ -102,13 +102,19 @@ chmod +x run_model.sh
 ## Option 2: Clone the Repository & Build Locally
 If you'd like to reproduce the entire pipeline locally:
 
-1. Clone the repository
+1. Clone the repository Ensure you have Git LFS installed before cloning:
 ```bash
+   git lfs install
    git clone git@github.com:<your-username>/zelus_mle_assessment.git
    cd zelus_mle_assessment
 ```
 
-2. Install dependencies
+2. Download large files The data/provided_json folder contains large files managed with Git LFS. After cloning the repository, run:
+```bash
+   git lfs pull
+```
+
+3. Install dependencies
 ```bash
    pip install uv
    uv sync

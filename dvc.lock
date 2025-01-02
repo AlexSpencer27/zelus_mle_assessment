@@ -73,8 +73,8 @@ stages:
       size: 13361019
     - path: ./src/dataset_curation/q3a.py
       hash: md5
-      md5: 5c88842486afad4d48c01e65e389c8d8
-      size: 1157
+      md5: 7f258cbb6ce0b3263768faefdf9d7667
+      size: 1318
     - path: pyproject.toml
       hash: md5
       md5: d03cc4118efec275d89e9815b5754945
@@ -82,8 +82,8 @@ stages:
     outs:
     - path: ./data/intermediate/q3a.csv
       hash: md5
-      md5: 99449eefbf003cdacce972d992e1c8b9
-      size: 16977100
+      md5: 757a147fa515a71d58fd52a9c74be428
+      size: 45146676
   create_training_data:
     cmd: python ./src/dataset_curation/create_training_data.py
     deps:
