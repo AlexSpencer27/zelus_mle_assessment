@@ -120,6 +120,8 @@ If you'd like to reproduce the entire pipeline locally:
    uv sync
 ```
 
+Then, simply activate the resulting .venv
+
 ### Visualizing & Reproducing the Pipeline
 This project uses DVC (Data Version Control) to manage and orchestrate the entire pipeline.
 
@@ -140,12 +142,13 @@ dvc repro
 
 This command will:
 
-Parse match and innings results.
-Filter and prepare training data.
-Test data quality.
-Train the model.
-Run all tests (data quality, training, and model interaction).
-Build the Docker image for deployment.
-The pipeline is modular, so you can rerun specific stages if needed by specifying the target stage.
+- Parse match and innings results
+- Filter and prepare training data
+- Test data quality
+- Train the model
+- Run all tests (data quality, training, and model interaction)
+- Build the Docker image for deployment
+
+The pipeline is modular, so you can rerun specific stages if needed by specifying the target stage. DVC has a lot of documentation on these kinds of things!
 
 I did not optimize for runtime, so it will take a few minutes from start->finish.
